@@ -263,11 +263,11 @@ public class DES {
         int[] temp_d = d0;
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 28; j++) {
-                cc[i][j]=temp_c[(j-keyoff[i]+28)%28];
-                dd[i][j]=temp_d[(j-keyoff[i]+28)%28];
+                cc[i][j] = temp_c[(j - keyoff[i] + 28) % 28];
+                dd[i][j] = temp_d[(j - keyoff[i] + 28) % 28];
             }
-            temp_c=cc[i];
-            temp_d=dd[i];
+            temp_c = cc[i];
+            temp_d = dd[i];
         }
         //将cc[]dd[]组合为cd[]
         int[][] cd = new int[16][56];
