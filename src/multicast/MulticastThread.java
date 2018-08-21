@@ -1,4 +1,4 @@
-package test;
+package multicast;
 
 
 import java.net.DatagramPacket;

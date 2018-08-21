@@ -1,13 +1,9 @@
-package test.md5;
+package multicast.md5;
 
 
 import java.security.Key;
 
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.DESKeySpec;
-import javax.crypto.spec.IvParameterSpec;
 
 /**
  * DES加密和解密工具,可以对字符串进行加密和解密操作  。

@@ -1,4 +1,4 @@
-package test.md5;
+package multicast.md5;
 
 import java.io.File;
 import java.io.FileInputStream;
