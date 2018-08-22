@@ -1,5 +1,7 @@
-package multicast.md5;
-
+/**
+ * Copyright (C) 2013-2014 科大讯飞股份有限公司 - All rights reserved.
+ */
+package des;
 
 import java.security.Key;
 
@@ -7,23 +9,27 @@ import javax.crypto.Cipher;
 
 /**
  * DES加密和解密工具,可以对字符串进行加密和解密操作  。
+ *
+ * @author 刘尧兴
+ * <p>2009-12-5</p>
  */
 public class DesCyUtils {
 
-
-    public static final String DES_KEY = "jevicjob";//点击头像授权登陆的密钥
-    private static final String TOKEN = "CYS-b8f8";//与PC端发送start指令所需的密钥
+    private static final String TOKEN = "DATEDU-a1111";
     /**
      * 加密工具
      */
-    private Cipher encryptCipher = null;
+    private Cipher encryptCipher;
+
     /**
      * 解密工具
      */
-    private Cipher decryptCipher = null;
+    private Cipher decryptCipher;
 
     /**
      * 指定密钥构造方法
+     *
+     * @throws Exception
      */
     public DesCyUtils() throws Exception {
         //  Security.addProvider(new com.sun.crypto.provider.SunJCE());
@@ -44,13 +50,12 @@ public class DesCyUtils {
      * @return 转换后的字符串
      * @throws Exception 本方法不处理任何异常，所有异常全部抛出
      */
-    private static String byteArr2HexStr(byte[] arrB) throws Exception {
+    public static String byteArr2HexStr(byte[] arrB) throws Exception {
         int iLen = arrB.length;
         // 每个byte用两个字符才能表示，所以字符串的长度是数组长度的两倍
-
-        StringBuilder sb = new StringBuilder(iLen * 2);
-        for (byte anArrB : arrB) {
-            int intTmp = anArrB;
+        StringBuffer sb = new StringBuffer(iLen * 2);
+        for (int i = 0; i < iLen; i++) {
+            int intTmp = arrB[i];
             // 把负数转换为正数
             while (intTmp < 0) {
                 intTmp = intTmp + 256;
@@ -73,7 +78,7 @@ public class DesCyUtils {
      * @throws Exception 本方法不处理任何异常，所有异常全部抛出
      * @author <a href="mailto:leo841001@163.com">LiGuoQing</a>
      */
-    private static byte[] hexStr2ByteArr(String strIn) throws Exception {
+    public static byte[] hexStr2ByteArr(String strIn) throws Exception {
         byte[] arrB = strIn.getBytes();
         int iLen = arrB.length;
 
@@ -86,15 +91,28 @@ public class DesCyUtils {
         return arrOut;
     }
 
-
+    public static void main(String[] args) {
+        String input = "jqtest";
+        String output = "";
+        String output2 = "";
+        try {
+            output = new DesCyUtils().encrypt(input);
+            output2 = new DesCyUtils().decrypt(output);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        SysLog.i("加密为 " + output);
+        SysLog.i("解密为 " + output2);
+    }
 
     /**
      * 加密字节数组
      *
      * @param arrB 需加密的字节数组
      * @return 加密后的字节数组
+     * @throws Exception
      */
-    private byte[] encrypt(byte[] arrB) throws Exception {
+    public byte[] encrypt(byte[] arrB) throws Exception {
         return encryptCipher.doFinal(arrB);
     }
 
@@ -103,6 +121,7 @@ public class DesCyUtils {
      *
      * @param strIn 需加密的字符串
      * @return 加密后的字符串
+     * @throws Exception
      */
     public String encrypt(String strIn) throws Exception {
         return byteArr2HexStr(encrypt(strIn.getBytes()));
@@ -113,8 +132,9 @@ public class DesCyUtils {
      *
      * @param arrB 需解密的字节数组
      * @return 解密后的字节数组
+     * @throws Exception
      */
-    private byte[] decrypt(byte[] arrB) throws Exception {
+    public byte[] decrypt(byte[] arrB) throws Exception {
         return decryptCipher.doFinal(arrB);
     }
 
@@ -123,6 +143,7 @@ public class DesCyUtils {
      *
      * @param strIn 需解密的字符串
      * @return 解密后的字符串
+     * @throws Exception
      */
     public String decrypt(String strIn) throws Exception {
         return new String(decrypt(hexStr2ByteArr(strIn)));
@@ -133,6 +154,7 @@ public class DesCyUtils {
      *
      * @param arrBTmp 构成该字符串的字节数组
      * @return 生成的密钥
+     * @throws Exception
      */
     private Key getKey(byte[] arrBTmp) throws Exception {
         // 创建一个空的8位字节数组（默认值为0）

@@ -1,4 +1,4 @@
-package encode;
+package aes;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,8 +25,8 @@ import javax.crypto.spec.SecretKeySpec;
  * @author jqorz
  * @since 2018/8/4
  */
-public class AES {
-    private static final String TAG = AES.class.getSimpleName();
+public class AESFile {
+    private static final String TAG = AESFile.class.getSimpleName();
     private static String mSeed = "dfdas7894513xc21asd878ds4c5x1v32df4g56wr7qw89d43c1324165wef4w";
 
     public static void main(String[] args) {
@@ -59,7 +59,7 @@ public class AES {
                 return false;
             }
 
-            Cipher mCipher = Cipher.getInstance("AES/CFB/NoPadding");
+            Cipher mCipher = Cipher.getInstance("AESFile/CFB/NoPadding");
 
             byte[] rawkey = getRawKey(seed);
             File sourceFile = new File(sourceFilePath);
@@ -68,7 +68,7 @@ public class AES {
             sourceFC = new RandomAccessFile(sourceFile, "r").getChannel();
             targetFC = new RandomAccessFile(targetFile, "rw").getChannel();
 
-            SecretKeySpec secretKey = new SecretKeySpec(rawkey, "AES");
+            SecretKeySpec secretKey = new SecretKeySpec(rawkey, "AESFile");
 
             mCipher.init(cipherMode, secretKey, new IvParameterSpec(
                     new byte[mCipher.getBlockSize()]));
@@ -119,7 +119,7 @@ public class AES {
     private static byte[] getRawKey(String seed) throws NoSuchAlgorithmException, InvalidKeySpecException {
 
         // 密钥的比特位数，注意这里是比特位数
-        // AES 支持 128、192 和 256 比特长度的密钥
+        // AESFile 支持 128、192 和 256 比特长度的密钥
         int keyLength = 256;
         // 盐值的字节数组长度，注意这里是字节数组的长度
         // 其长度值需要和最终输出的密钥字节数组长度一致
@@ -145,7 +145,7 @@ public class AES {
                 .getInstance("PBKDF2WithHmacSHA1");
         // 到这里你就能拿到一个安全的密钥了
         byte[] keyBytes = keyFactory.generateSecret(keySpec).getEncoded();
-        SecretKey key = new SecretKeySpec(keyBytes, "AES");
+        SecretKey key = new SecretKeySpec(keyBytes, "AESFile");
         return key.getEncoded();
     }
 
