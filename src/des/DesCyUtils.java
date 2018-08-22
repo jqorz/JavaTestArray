@@ -15,7 +15,7 @@ import javax.crypto.Cipher;
  */
 public class DesCyUtils {
 
-    private static final String TOKEN = "DATEDU-a1111";
+    private static final String TOKEN = "DATEDU-a";
     /**
      * 加密工具
      */
@@ -92,7 +92,7 @@ public class DesCyUtils {
     }
 
     public static void main(String[] args) {
-        String input = "jqtest";
+        String input = "111111";
         String output = "";
         String output2 = "";
         try {
