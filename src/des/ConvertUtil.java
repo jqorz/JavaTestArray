@@ -50,7 +50,7 @@ public class ConvertUtil {
             sTemp = Integer.toHexString(0xFF & aBArray);
             if (sTemp.length() < 2)
                 sb.append(0);
-            sb.append(sTemp.toUpperCase());
+            sb.append(sTemp);
         }
         return sb.toString();
     }
