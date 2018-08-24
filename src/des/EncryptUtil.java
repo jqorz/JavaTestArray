@@ -60,8 +60,8 @@ public class EncryptUtil {
     }
 
     public static void main(String[] args) throws Exception {
-        String clearText = "springsk";  //这里的数据长度必须为8的倍数
-        String key = "91j#W!9q";
+        String clearText = "111111";  //这里的数据长度必须为8的倍数
+        String key = "DATEDU-a";
         String encryptText = encryptDES(clearText, key);
         System.out.println("加密后：" + encryptText);
         String decryptText = decryptDES(encryptText, key);
