@@ -1,5 +1,7 @@
 package string;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * @author jqorz
  * @since 2018/8/21.
@@ -23,5 +25,21 @@ class StringTest {
             }
         }
         return okLen;
+    }
+
+    public static void main(String[] args) {
+        String s = "我爱你";
+        try {
+            String s1 = new String(s.getBytes("utf-8"), "gb2312");
+            System.out.println("s1 = " + s1);
+            String s2 = new String(s1.getBytes("gb2312"), "utf-8");
+            System.out.println("s2 = " + s2);
+            String s3 = new String(s2.getBytes(), "utf-8");
+            System.out.println("s3 = " + s3);
+            String s4 = new String(s.getBytes(), "gb2312");
+            System.out.println("s4 = " + s4);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 }
