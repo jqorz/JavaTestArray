@@ -3,22 +3,32 @@ package encode;
 /**
  * RC4加密
  */
-public class RC41 {
+public class RC40 {
 
     public static void main(String[] args) {
         String source = "这是一个用来加密的数据Data";
         String key = "justfortest";// 初始密钥
         byte[] str = encrypt(source.getBytes(), key.getBytes());
         String hex = FileUtil.byte2HexStr(str);
-        System.out.println("RC41 加密后的内容hex为--" + hex);
+        System.out.println("RC40 加密后的内容hex为--" + hex);
 //        System.out.println("解密后的内容为--" + FileUtil.byte2String(encrypt(FileUtil.hexStr2Bytes(hex), key.getBytes())));
 
     }
 
 
 
-    // 对字符串进行方式二解密
+    // 对字符串进行加密解密
     public static byte[] encrypt(byte[] input, byte[] key) {
+        byte[] ouput = new byte[input.length];
+        int[] s = initKey(key);
+        for (int i = 0; i < input.length; i++) {
+            ouput[i] = (byte) (input[i] ^ getKey(s));
+        }
+        return ouput;
+    }
+
+    // 对字符串进行方式二解密
+    public static byte[] encrypt2(byte[] input, byte[] key) {
         byte[] ouput = new byte[input.length];
         int[] s = initKey(key);
         int[] ss = s.clone();
