@@ -38,7 +38,7 @@ public class RC42 {
 
 
 
-    private static byte[] encrypt(byte[] input, byte[] mKkey) {
+    public static byte[] encrypt(byte[] input, byte[] mKkey) {
         int x = 0;
         int y = 0;
         byte[] key = initKey(mKkey);
