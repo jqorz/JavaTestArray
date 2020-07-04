@@ -65,7 +65,10 @@ public class RC44 {
             str = encrypt(source.getBytes(), key.getBytes());
             String hex = FileUtil.byte2HexStr(str);
             System.out.println("RC44 加密后的内容hex为--" + hex);
-//        System.out.println("解密后的内容为--" + FileUtil.byte2String(encrypt(FileUtil.hexStr2Bytes(hex), key.getBytes())));
+
+            byte[] str2= encrypt(str,key.getBytes());
+            System.out.println("RC44 解密后的内容hex为--" + FileUtil.byte2String(str2));
+
         } catch (InvalidKeyException e) {
             e.printStackTrace();
         }
