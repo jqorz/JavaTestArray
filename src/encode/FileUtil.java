@@ -101,11 +101,7 @@ public class FileUtil {
 
 
     public static String byte2String(byte[] buf) {
-        StringBuilder strbuf = new StringBuilder(buf.length);
-        for (byte b : buf) {
-            strbuf.append((char) b);
-        }
-        return strbuf.toString();
+        return new String(buf);
     }
 
     public static byte[] file2Byte(String filePath) {

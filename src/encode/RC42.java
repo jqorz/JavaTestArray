@@ -10,6 +10,9 @@ public class RC42 {
         System.out.println("RC42 加密后的内容hex为--" + hex);
 //        System.out.println("解密后的内容为--" + FileUtil.byte2String(encrypt(FileUtil.hexStr2Bytes(hex), key.getBytes())));
 
+        byte[] str2= encrypt(str,key.getBytes());
+        System.out.println("RC42 解密后的内容hex为--" + FileUtil.byte2String(str2));
+
     }
 
 
