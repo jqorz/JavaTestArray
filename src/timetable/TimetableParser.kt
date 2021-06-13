@@ -1,18 +1,27 @@
-package parser
+package timetable
 
+import timetable.model.CourseInfoModel
+import timetable.model.CourseModel
+import timetable.model.TimetableModel
 import utils.FileUtils
+import utils.GsonUtil
+import java.util.*
 
-object AydTimetableParser {
-    @JvmStatic
-    fun main(args: Array<String>) {
-        val html = FileUtils.readText("D:\\桌面\\安医大助手教务数据\\课表查询-2.txt")
+/**
+ * @author  jqorz
+ * @since  2021/6/8
+ */
+object TimetableParser {
+    private fun getTimetableResult(): Map<Int, List<TimetableModel>> {
         //<td>10</td>
         //<td>13001001</td><td>医学文献检索</td><td>1</td><td>		<a href="/eams/courseTableForStd!taskTable.action?lesson.id=199948" onclick="return bg.Go(this,null)" title="点击显示单个教学任务具体安排">(2020-2021-1)-13001001-2009500013-015</a>
         //</td><td>邹聪</td>
+        val html = FileUtils.readText("D:\\桌面\\安医大助手教务数据\\课表查询-2.txt")
+
         val courseRegex = Regex("<td>(\\d*)</td>\\s*<td>(\\S*)</td>\\s*<td>(.+)</td>\\s*<td>((\\d)|(\\d.\\d))</td>\\s*<td>\\s*<a href=.*\\s.*\\s.*\\s.*>.*</a>\\s*</td>\\s*<td>(.*)</td>")
         val reg1 = Regex("(?i)<td>([^>]*)</td>")
         val reg2 = Regex(">([^>]*)</a>")
-        val courseInfoList = arrayListOf<CourseInfo>()
+        val courseInfoList = arrayListOf<CourseInfoModel>()
         courseRegex.findAll(html).forEach {
             val courseSort = reg2.find(it.value)?.groups?.get(1)?.value
             val info = reg1.findAll(it.value).toMutableList()
@@ -20,7 +29,7 @@ object AydTimetableParser {
             val courseName = info[2].groups[1]?.value
             val credit = info[3].groups[1]?.value
             val teacherName = info[4].groups[1]?.value
-            courseInfoList.add(CourseInfo(courseSort, courseId, courseName, credit, teacherName))
+            courseInfoList.add(CourseInfoModel(courseSort, courseId, courseName, credit, teacherName))
         }
         //TaskActivity(actTeacherId.join(','),actTeacherName.join(','),"1015((2020-2021-1)-04001110-1992500025-001)","医院管理学","176","1204(南)(翡翠路校区)","01111101111000000000000000000000000000000000000000000",null,"",assistantName,"","");
         //			index =2*unitCount+0;
@@ -32,7 +41,7 @@ object AydTimetableParser {
         val timetableRegex = Regex("TaskActivity\\(actTeacherId.join\\(','\\),actTeacherName.join\\(','\\),\".*(\\(.*)\\)\",\"(.*)\",\"(.*)\",\"(.*)\",\"(.*)\",null,\"\",assistantName,\"\",\"(\\d)?\"\\);((?:\\s*index =\\d+\\*unitCount\\+\\d+;\\s*.*\\s)+)")
         //index =2*unitCount+0;
         val reg3 = Regex("index =(\\d+)\\*unitCount\\+(\\d+);")
-        val timetableList = arrayListOf<TimetableModel>()
+        val courseList = arrayListOf<CourseModel>()
         timetableRegex.findAll(html).forEach {
             val courseSort = it.groups[1]?.value //(2020-2021-1)-04001110-1992500025-001
             val courseName = it.groups[2]?.value//医院管理学
@@ -43,48 +52,66 @@ object AydTimetableParser {
             val info = it.groups[7]?.value
             if (info != null) {
                 var dayOfWeek: String? = null
-                val timeOfDays = arrayListOf<String>()
+                val timeOfDays = arrayListOf<Int>()
                 reg3.findAll(info).forEach { each ->
                     dayOfWeek = each.groups[1]?.value
                     each.groups[2]?.value?.let { timeOfDay ->
-                        timeOfDays.add(timeOfDay)
+                        timeOfDays.add(timeOfDay.toInt())
                     }
                 }
-                timetableList.add(TimetableModel(courseSort, courseName, classroomId, classroomName, weeks, dayOfWeek, timeOfDays, groupName))
+                courseList.add(CourseModel(courseSort, courseName, classroomId, classroomName, weeks, dayOfWeek, timeOfDays, groupName))
             }
         }
-        print(courseInfoList)
-        print(timetableList)
+        val result = arrayListOf<TimetableModel>()
 
-    }
+        courseList.forEach { course ->
+            val info = courseInfoList.find { it.courseSort == course.courseSort } ?: return@forEach
 
-    class TimetableModel(
-            val courseSort: String?,
-            val courseName: String?,
-            val classroomId: String?,
-            val classroomName: String?,
-            val weeks: String?,
-            val dayOfWeek: String?,
-            val timeOfDays: MutableList<String>?,
-            val groupName: String?
-    ) {
-        override fun toString(): String {
-            return "TimetableModel(courseSort=$courseSort, courseName=$courseName, classroomId=$classroomId, classroomName=$classroomName, weeks=$weeks, dayOfWeek=$dayOfWeek, timeOfDays=$timeOfDays, groupName=$groupName)"
+            course.weeks?.toCharArray()?.forEachIndexed { weekIndex, c ->
+                if (c == '1') {
+                    course.timeOfDays?.groupByConsequent()?.forEach { timeOfDayGroup ->
+                        val courseCd = timeOfDayGroup.size
+
+                        result.add(TimetableModel(
+                                info.courseSort ?: "", info.courseName ?: "", course.classroomName ?: "",
+                                info.teacherName ?: "", timeOfDayGroup[0], course.dayOfWeek?.toIntOrNull() ?: 0,
+                                weekIndex + 1, info.credit ?: "", courseCd, course.groupName ?: ""
+                        ))
+                    }
+
+                }
+            }
         }
+        return result.groupBy { it.week }
     }
 
-    /**
-     * CourseInfo(courseSort=(2020-2021-1)-04001110-1992500025-001, courseId=04001A23, courseName=医院管理学, credit=2, teacherName=肖锦铖)
-     */
-    class CourseInfo(
-            val courseSort: String?,
-            val courseId: String?,
-            val courseName: String?,
-            val credit: String?,
-            val teacherName: String?
-    ) {
-        override fun toString(): String {
-            return "CourseInfo(courseSort=$courseSort, courseId=$courseId, courseName=$courseName, credit=$credit, teacherName=$teacherName)"
+    private fun MutableList<Int>.groupByConsequent(): List<MutableList<Int>> {
+        val stackList = arrayListOf<Stack<Int>>()
+        var stack = Stack<Int>()
+        stackList.add(stack)
+
+        forEach { item ->
+            if (stack.isEmpty()) {
+                stack.push(item)
+            } else {
+                if ((item - 1) != stackList[stackList.size - 1].peek()) {
+                    stack = Stack()
+                    stack.push(item)
+                    stackList.add(stack)
+                } else {
+                    stackList[stackList.size - 1].push(item)
+                }
+            }
+        }
+        return stackList.map { it.toMutableList() }
+
+    }
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        getTimetableResult().forEach { (t, u) ->
+            println("第${t}周")
+            println(GsonUtil.jsonCreate(u))
         }
     }
 }
