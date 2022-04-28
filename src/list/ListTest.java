@@ -10,9 +10,14 @@ public class ListTest {
         for (int i = 0; i < 5; i++) {
             list.add(String.valueOf(i));
         }
-        for (int i = 0; i < list.size(); i++) {
-            if (i==3){
-                list.add(3,"s");
+//        for (int i = 0; i < list.size(); i++) {
+//            if (i==3){
+//                list.add(3,"s");
+//            }
+//        }
+        for (String s:list) {
+            if (s.equals("3")){
+                list.add("s");
             }
         }
         System.out.println(GsonUtil.jsonCreate(list));
